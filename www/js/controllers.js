@@ -1,4 +1,4 @@
-angular.module('starter.controllers', [])
+angular.module('yourAppsName.controllers', [])
 
 .controller('AppCtrl', function($scope, $ionicModal, $timeout) {
 
@@ -8,7 +8,14 @@ angular.module('starter.controllers', [])
   // listen for the $ionicView.enter event:
   //$scope.$on('$ionicView.enter', function(e) {
   //});
-
+  $scope.playlists = [
+    { title: 'test value', id: 1 },
+    { title: 'Chill', id: 2 },
+    { title: 'Dubstep', id: 3 },
+    { title: 'Indie', id: 4 },
+    { title: 'Rap', id: 5 },
+    { title: 'Cowbell', id: 6 }
+  ];
   // Form data for the login modal
   $scope.loginData = {};
 
@@ -31,7 +38,6 @@ angular.module('starter.controllers', [])
 
   // Perform the login action when the user submits the login form
   $scope.doLogin = function() {
-    console.log('Doing login', $scope.loginData);
 
     // Simulate a login delay. Remove this and replace with your login
     // code if using a login system
@@ -41,16 +47,59 @@ angular.module('starter.controllers', [])
   };
 })
 
-.controller('PlaylistsCtrl', function($scope) {
-  $scope.playlists = [
-    { title: 'Reggae', id: 1 },
-    { title: 'Chill', id: 2 },
-    { title: 'Dubstep', id: 3 },
-    { title: 'Indie', id: 4 },
-    { title: 'Rap', id: 5 },
-    { title: 'Cowbell', id: 6 }
-  ];
-})
+.controller('MyStocksCtrl', ['$scope',
+  function($scope) {
 
-.controller('PlaylistCtrl', function($scope, $stateParams) {
-});
+  $scope.myStocksArray = [
+    {ticker: "AAPL"},
+    {ticker: "GPRO"},
+    {ticker: "FB"},
+    {ticker: "NFLX"},
+    {ticker: "TSLA"},
+    {ticker: "BRK-A"},
+    {ticker: "INTC"},
+    {ticker: "MSFT"},
+    {ticker: "GE"},
+    {ticker: "BAC"},
+    {ticker: "C"},
+    {ticker: "T"}
+  ];
+
+}])
+
+.controller('StockCtrl', ['$scope', '$stateParams', 'stockDataService',
+  function($scope, $stateParams, stockDataService) {
+
+    $scope.ticker = $stateParams.stockTicker;
+    $scope.chartView = 1;
+
+    $scope.$on("$ionicView.afterEnter", function(){
+      getPriceData();
+      getDetailsData();
+    });
+
+    $scope.chartViewFunc = function(n){
+      $scope.chartView = n;
+    };
+
+    function getPriceData(){
+
+      var promise = stockDataService.getPriceData($scope.ticker);
+
+      promise.then(function(data){
+        console.log(data);
+        $scope.stockPriceData = data;
+      });
+    }
+
+    function getDetailsData(){
+
+      var promise = stockDataService.getDetailsData($scope.ticker);
+
+      promise.then(function(data){
+        console.log(data);
+        $scope.stockDetailsData = data;
+      });
+    }
+
+}]);
